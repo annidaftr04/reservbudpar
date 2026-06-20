@@ -79,9 +79,9 @@ $queryHistory->bind_param(
 
 $queryHistory->execute();
 $history =
-$queryHistory
-->get_result()
-->fetch_assoc();
+    $queryHistory
+    ->get_result()
+    ->fetch_assoc();
 
 // ======================================================
 // AMBIL DATA TEMPAT
@@ -97,6 +97,7 @@ if (!$resultPlaces) {
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -104,7 +105,7 @@ if (!$resultPlaces) {
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link rel="icon" href="../assets/img/logotng.png" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -128,80 +129,151 @@ if (!$resultPlaces) {
 
         /* Sidebar Styling */
         .sidebar {
-            width: 280px; height: 100vh; background: var(--sidebar-color);
-            position: fixed; border-right: 1px solid rgba(0,0,0,0.05);
-            z-index: 1100; padding: 2.5rem 1.5rem;
+            width: 280px;
+            height: 100vh;
+            background: var(--sidebar-color);
+            position: fixed;
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            z-index: 1100;
+            padding: 2.5rem 1.5rem;
         }
 
         .sidebar-brand {
-            display: flex; align-items: center; gap: 12px;
-            padding-bottom: 2.5rem; font-weight: 800; font-size: 1.5rem;
-            color: var(--primary); letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 2.5rem;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary);
+            letter-spacing: -1px;
         }
 
         .nav-link {
-            display: flex; align-items: center; gap: 15px;
-            padding: 14px 1rem; color: var(--text-muted); text-decoration: none;
-            font-weight: 600; border-radius: 14px; transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 14px;
+            transition: 0.3s;
             margin-bottom: 8px;
         }
 
-        .nav-link:hover, .nav-link.active {
-            background: var(--primary); color: white;
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
             box-shadow: 0 10px 20px -5px rgba(67, 97, 238, 0.4);
         }
 
         /* Main Content */
-        .main-content { margin-left: 280px; flex: 1; padding: 3rem; min-height: 100vh; }
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 3rem;
+            min-height: 100vh;
+        }
 
         .glass-header {
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(15px);
-            padding: 2rem; border-radius: 24px;
+            padding: 2rem;
+            border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.5);
             margin-bottom: 2.5rem;
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
         }
 
         .content-card {
-            background: white; border-radius: 30px; padding: 3rem;
+            background: white;
+            border-radius: 30px;
+            padding: 3rem;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0,0,0,0.01);
+            border: 1px solid rgba(0, 0, 0, 0.01);
         }
 
-        .form-label { font-weight: 700; color: var(--text-main); font-size: 0.9rem; margin-bottom: 10px; }
-        
-        .form-control, .form-select {
-            border-radius: 14px; padding: 14px 18px; border: 2.5px solid #f1f5f9;
-            font-weight: 500; transition: all 0.3s ease; background: #f8fafc;
+        .form-label {
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
         }
-        
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary); background: white;
+
+        .form-control,
+        .form-select {
+            border-radius: 14px;
+            padding: 14px 18px;
+            border: 2.5px solid #f1f5f9;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            background: white;
             box-shadow: 0 0 0 5px rgba(67, 97, 238, 0.08);
             outline: none;
         }
 
         .booking-tag {
-            background: rgba(67, 97, 238, 0.1); color: var(--primary);
-            padding: 5px 15px; border-radius: 50px; font-weight: 700; font-size: 0.8rem;
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.8rem;
         }
 
         .btn-modern {
-            padding: 14px 35px; border-radius: 16px; font-weight: 700;
-            transition: 0.3s; display: flex; align-items: center; gap: 8px;
+            padding: 14px 35px;
+            border-radius: 16px;
+            font-weight: 700;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .btn-save-md { background: var(--primary); color: white; border: none; }
-        .btn-save-md:hover { background: #3651d4; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(67, 97, 238, 0.2); }
-        
-        .btn-cancel-md { background: #e2e8f0; color: #64748b; text-decoration: none; }
-        .btn-cancel-md:hover { background: #cbd5e1; transform: translateY(-3px); }
+        .btn-save-md {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-save-md:hover {
+            background: #3651d4;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn-cancel-md {
+            background: #e2e8f0;
+            color: #64748b;
+            text-decoration: none;
+        }
+
+        .btn-cancel-md:hover {
+            background: #cbd5e1;
+            transform: translateY(-3px);
+        }
 
         @media (max-width: 992px) {
-            .sidebar { transform: translateX(-100%); }
-            .main-content { margin-left: 0; padding: 1.5rem; }
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -217,8 +289,10 @@ if (!$resultPlaces) {
             <a href="kelola_reserv.php" class="nav-link active"><i class="fa-solid fa-calendar-check"></i> Reservasi</a>
             <a href="kelola_tempat.php" class="nav-link"><i class="fa-solid fa-map-location-dot"></i> Kelola Tempat</a>
             <a href="calendar.php" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Kalender</a>
-            <div style="margin: 2rem 0;"><hr style="opacity: 0.1;"></div>
-            <a href="logout_admin.php"class="nav-link text-danger"onclick="confirmAdminLogout(event)"><i class="fas fa-sign-out-alt"></i>Logout</a>
+            <div style="margin: 2rem 0;">
+                <hr style="opacity: 0.1;">
+            </div>
+            <a href="logout_admin.php" class="nav-link text-danger" onclick="confirmAdminLogout(event)"><i class="fas fa-sign-out-alt"></i>Logout</a>
         </nav>
     </aside>
 
@@ -278,13 +352,13 @@ if (!$resultPlaces) {
                                 <h6 class="fw-bold mt-3">
 
                                     <?= $history['terakhir_reservasi']
-                                    ? date(
-                                        'd M Y',
-                                        strtotime(
-                                            $history['terakhir_reservasi']
+                                        ? date(
+                                            'd M Y',
+                                            strtotime(
+                                                $history['terakhir_reservasi']
+                                            )
                                         )
-                                    )
-                                    : '-'; ?>
+                                        : '-'; ?>
                                 </h6>
                             </div>
                         </div>
@@ -312,7 +386,7 @@ if (!$resultPlaces) {
                         <div class="mb-4">
                             <label class="form-label">Tempat Destinasi</label>
                             <select id="tempat" class="form-select">
-                                <?php while($places = $resultPlaces->fetch_assoc()): ?>
+                                <?php while ($places = $resultPlaces->fetch_assoc()): ?>
                                     <option value="<?= $places['id']; ?>" <?= $reservation['place_id'] == $places['id'] ? 'selected' : ''; ?>>
                                         <?= htmlspecialchars($places['name']); ?>
                                     </option>
@@ -354,96 +428,94 @@ if (!$resultPlaces) {
             </form>
         </div>
     </main>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-function confirmSave() {
-    const newStatus = document.getElementById('status').value;
-    const oldStatus = '<?= $reservation['status']; ?>';
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmSave() {
+            const newStatus = document.getElementById('status').value;
+            const oldStatus = '<?= $reservation['status']; ?>';
 
-    // ==================================================
-    // STATUS DISETUJUI
-    // ==================================================
-    if (newStatus === 'disetujui' && oldStatus !== 'disetujui') {
-        Swal.fire({
-            title: 'Reservasi Disetujui',
-            text: 'Ingin kirim WhatsApp juga?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Ya',
-            cancelButtonText: 'Tidak'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sendWhatsApp('disetujui');
-                setTimeout(() => {
-                    submitStatusUpdate();
-                }, 1000);
-            } else {
-                submitStatusUpdate();
+            // ==================================================
+            // STATUS DISETUJUI
+            // ==================================================
+            if (newStatus === 'disetujui' && oldStatus !== 'disetujui') {
+
+                Swal.fire({
+                    title: 'Setujui Reservasi?',
+                    text: 'Status reservasi akan diubah menjadi disetujui.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Setujui',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+                        submitStatusUpdate();
+                    }
+
+                });
+
             }
-        });
-    }
-    // ==================================================
-    // STATUS DITOLAK
-    // ==================================================
-    else if (newStatus === 'ditolak' && oldStatus !== 'ditolak') {
-        Swal.fire({
-            title: 'Reservasi Ditolak',
-            text: 'Ingin kirim WhatsApp juga?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya',
-            cancelButtonText: 'Tidak'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sendWhatsApp('ditolak');
-                setTimeout(() => {
-                    submitStatusUpdate();
-                }, 1000);
-            } else {
-                submitStatusUpdate();
+            // ==================================================
+            // STATUS DITOLAK
+            // ==================================================
+            else if (newStatus === 'ditolak' && oldStatus !== 'ditolak') {
+
+                Swal.fire({
+                    title: 'Tolak Reservasi?',
+                    text: 'Status reservasi akan diubah menjadi ditolak.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Tolak',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+                        submitStatusUpdate();
+                    }
+
+                });
+
             }
-        });
-    }
-    // ==================================================
-    // SAVE BIASA
-    // ==================================================
-    else {
-        Swal.fire({
-            title: 'Simpan perubahan?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                submitStatusUpdate();
+            // ==================================================
+            // SAVE BIASA
+            // ==================================================
+            else {
+                Swal.fire({
+                    title: 'Simpan perubahan?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        submitStatusUpdate();
+                    }
+                });
             }
-        });
-    }
-}
+        }
 
-// ======================================================
-// WHATSAPP
-// ======================================================
-function sendWhatsApp(status) {
-    const nama = document.getElementById('nama').value;
-    const noTelepon = document.getElementById('no_telepon').value.replace(/[^0-9]/g, '');
-    const tempat = document.getElementById('tempat');
-    const tempatText = tempat.options[tempat.selectedIndex].text;
-    const catatan = document.getElementById('catatan').value;
-    const kodeBooking = '<?= $reservation['kode_booking']; ?>';
-    const tanggal = '<?= $reservation['hari']; ?>';
+        // ======================================================
+        // WHATSAPP
+        // ======================================================
+        function sendWhatsApp(status) {
+            const nama = document.getElementById('nama').value;
+            const noTelepon = document.getElementById('no_telepon').value.replace(/[^0-9]/g, '');
+            const tempat = document.getElementById('tempat');
+            const tempatText = tempat.options[tempat.selectedIndex].text;
+            const catatan = document.getElementById('catatan').value;
+            const kodeBooking = '<?= $reservation['kode_booking']; ?>';
+            const tanggal = '<?= $reservation['hari']; ?>';
 
-    let formattedPhone = noTelepon;
-    if (formattedPhone.startsWith('0')) {
-        formattedPhone = '62' + formattedPhone.substring(1);
-    }
+            let formattedPhone = noTelepon;
+            if (formattedPhone.startsWith('0')) {
+                formattedPhone = '62' + formattedPhone.substring(1);
+            }
 
-    let message = '';
+            let message = '';
 
-    if (status === 'disetujui') {
-        message =
-        `Halo ${nama},
+            if (status === 'disetujui') {
+                message =
+                    `Halo ${nama},
         Kami dengan senang hati menginformasikan bahwa reservasi Anda telah DISETUJUI. 🎉
         Detail reservasi:
         📍 Tempat : ${tempatText}
@@ -453,9 +525,9 @@ function sendWhatsApp(status) {
         ${catatan}
         ` : ''}Silakan datang sesuai jadwal yang telah ditentukan.
         Terima kasih telah menggunakan layanan reservasi Disbudpar Kota Tangerang 😊`;
-    } else {
-        message =
-        `Halo ${nama},
+            } else {
+                message =
+                    `Halo ${nama},
         Mohon maaf, reservasi Anda belum dapat kami setujui.
         Detail reservasi:
         📍 Tempat : ${tempatText}
@@ -465,111 +537,161 @@ function sendWhatsApp(status) {
         ${catatan}
         ` : ''}Untuk informasi lebih lanjut, silakan hubungi admin Disbudpar Kota Tangerang.
         Terima kasih atas perhatian dan pengertiannya 🙏`;
-    }
-    const waLink =`https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
-
-    // ==========================================
-    // SIMPAN LOG WHATSAPP
-    // ==========================================
-    fetch('save_notif_log.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type':
-            'application/x-www-form-urlencoded'
-        },
-        body:
-            'reservation_id=<?= $reservation['id']; ?>' +
-            '&email=' +
-            encodeURIComponent(
-                document.getElementById('email').value
-            )
-    });
-
-
-    // ==========================================
-    // BUKA WHATSAPP
-    // ==========================================
-
-    window.open(waLink, '_blank');
-    }
-
-    // ======================================================
-    // SUBMIT AJAX
-    // ======================================================
-    function submitStatusUpdate() {
-        const formData = new FormData();
-        formData.append('id', '<?= $reservation['id']; ?>');
-        formData.append('nama', document.getElementById('nama').value);
-        formData.append('no_telepon', document.getElementById('no_telepon').value);
-        formData.append('email', document.getElementById('email').value);
-        formData.append('place_id', document.getElementById('tempat').value);
-        formData.append('keterangan', document.getElementById('keterangan').value);
-        formData.append('status', document.getElementById('status').value);
-        formData.append('note', document.getElementById('catatan').value);
-
-        fetch('update_status.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.text())
-        .then(data => {
-            if (data.trim() === 'OK') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: 'Reservasi berhasil diperbarui'
-                }).then(() => {
-                    window.location.href = 'kelola_reserv.php';
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: data
-                });
-                console.log(data);
             }
-        })
-        .catch(error => {
-            console.log(error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Server error'
-            });
-        });
-    }
+            const waLink = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
 
-    function confirmAdminLogout(event) {
-        event.preventDefault();
-        Swal.fire({
-        title: 'Logout Admin?',
-        text: 'Anda yakin ingin keluar dari dashboard admin?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: 'Ya, Logout',
-        cancelButtonText: 'Batal',
-        borderRadius: '20px'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            Swal.fire({
-                title: 'Sedang logout...',
-                text: 'Mohon tunggu sebentar',
-                icon: 'success',
-                timer: 1200,
-                showConfirmButton: false,
-                allowOutsideClick: false
+            // ==========================================
+            // SIMPAN LOG WHATSAPP
+            // ==========================================
+            fetch('save_notif_log.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'reservation_id=<?= $reservation['id']; ?>' +
+                    '&email=' +
+                    encodeURIComponent(
+                        document.getElementById('email').value
+                    )
             });
-        setTimeout(() => {
-            window.location.href = 'logout_admin.php';
-                }, 1200);
-            }
-        });
-    }
 
-</script>
+
+            // ==========================================
+            // BUKA WHATSAPP
+            // ==========================================
+
+            window.open(waLink, '_blank');
+        }
+
+        // ======================================================
+        // SUBMIT AJAX
+        // ======================================================
+        function submitStatusUpdate() {
+            const formData = new FormData();
+            formData.append('id', '<?= $reservation['id']; ?>');
+            formData.append('nama', document.getElementById('nama').value);
+            formData.append('no_telepon', document.getElementById('no_telepon').value);
+            formData.append('email', document.getElementById('email').value);
+            formData.append('place_id', document.getElementById('tempat').value);
+            formData.append('keterangan', document.getElementById('keterangan').value);
+            formData.append('status', document.getElementById('status').value);
+            formData.append('note', document.getElementById('catatan').value);
+
+            fetch('update_status.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    if (data.trim() === 'EMAIL_SUCCESS') {
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Email Berhasil Dikirim',
+                            text: 'Reservasi berhasil diperbarui dan email notifikasi telah berhasil dikirim.'
+                        }).then(() => {
+
+                            Swal.fire({
+                                title: 'Kirim WhatsApp juga?',
+                                text: 'Notifikasi email sudah berhasil dikirim.',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonText: 'Ya, Kirim WA',
+                                cancelButtonText: 'Tidak'
+                            }).then((result) => {
+
+                                if (result.isConfirmed) {
+                                    sendWhatsApp(
+                                        document.getElementById('status').value
+                                    );
+                                }
+
+                                window.location.href =
+                                    'kelola_reserv.php';
+
+                            });
+
+                        });
+
+                    } else if (data.trim() === 'EMAIL_FAILED') {
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Reservasi Berhasil Disimpan',
+                            text: 'Namun email notifikasi gagal dikirim.'
+                        });
+
+                    } else {
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Email Gagal Dikirim',
+                            text: 'Status reservasi berhasil diperbarui, namun email gagal dikirim.'
+                        }).then(() => {
+
+                            Swal.fire({
+                                title: 'Kirim WhatsApp sebagai alternatif?',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonText: 'Ya, Kirim WA',
+                                cancelButtonText: 'Tidak'
+                            }).then((result) => {
+
+                                if (result.isConfirmed) {
+                                    sendWhatsApp(
+                                        document.getElementById('status').value
+                                    );
+                                }
+
+                                window.location.href = 'kelola_reserv.php';
+
+                            });
+
+                        });
+
+                        console.log(data);
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Server error'
+                    });
+                });
+        }
+
+        function confirmAdminLogout(event) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Logout Admin?',
+                text: 'Anda yakin ingin keluar dari dashboard admin?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Logout',
+                cancelButtonText: 'Batal',
+                borderRadius: '20px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Sedang logout...',
+                        text: 'Mohon tunggu sebentar',
+                        icon: 'success',
+                        timer: 1200,
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                    });
+                    setTimeout(() => {
+                        window.location.href = 'logout_admin.php';
+                    }, 1200);
+                }
+            });
+        }
+    </script>
 
 </body>
+
 </html>

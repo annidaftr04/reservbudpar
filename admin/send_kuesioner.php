@@ -57,7 +57,7 @@ echo '<hr>';
 // =====================================================
 
 $link_kuesioner =
-"https://forms.gle/ISI_LINK_KUESIONER";
+    "https://forms.gle/ISI_LINK_KUESIONER";
 
 
 // =====================================================
@@ -379,14 +379,11 @@ HTML;
         );
 
         $update->execute();
+    } catch (Exception $e) {
 
-    }
-
-    catch (Exception $e) {
-
-    // =========================================
-    // EMAIL LOG GAGAL
-    // =========================================
+        // =========================================
+        // EMAIL LOG GAGAL
+        // =========================================
 
         $jenis_email = 'kuesioner_h1';
 
@@ -430,11 +427,7 @@ HTML;
         echo $mail->ErrorInfo;
 
         echo '<hr>';
-
     }
-
 }
 
 echo 'Selesai kirim email kuesioner';
-
-?>

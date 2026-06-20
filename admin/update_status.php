@@ -82,7 +82,7 @@ $reservation =
 // JIKA STATUS MASIH PENDING
 // ======================================================
 if ($status === 'pending') {
-    echo "OK";
+    echo "EMAIL_SUCCESS";
     exit;
 }
 
@@ -405,7 +405,7 @@ HTML;
         $status_pengiriman
     );
     $log->execute();
-    echo "OK";
+    echo "EMAIL_SUCCESS";
 }
 // ======================================================
 // ERROR EMAIL
@@ -435,5 +435,5 @@ catch (Exception $e) {
         $status_pengiriman
     );
     $log->execute();
-    echo $mail->ErrorInfo;
+    echo "EMAIL_FAILED: " . $mail->ErrorInfo;
 }
