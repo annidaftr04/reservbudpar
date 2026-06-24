@@ -16,7 +16,14 @@ if (isset($_POST['login'])) {
         $user = $result->fetch_assoc();
 
         if (password_verify($password, $user['password'])) {
+
             $_SESSION['user_id'] = $user['id'];
+
+            if (isset($_GET['redirect']) && !empty($_GET['redirect'])) {
+
+                header('Location: ' . urldecode($_GET['redirect']));
+                exit;
+            }
 
             header('Location: index.php');
             exit;
@@ -307,7 +314,9 @@ if (isset($_POST['login'])) {
         </form>
 
         <div class="footer-links text-center">
-            <p class="mb-2">Belum punya akun? <a href="register.php">Daftar Akun</a></p>
+            <p class="mb-2">Belum punya akun? <a href="register.php?redirect=<?= urlencode($_GET['redirect'] ?? '') ?>">
+                    Daftar Akun
+                </a></p>
             <a href="index.php" style="border:none;"><i class="fas fa-arrow-left me-2"></i>Kembali ke Beranda</a>
         </div>
 

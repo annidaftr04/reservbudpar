@@ -57,34 +57,48 @@ if (isset($_GET['id'])) {
     if (!empty($sub_places)) {
         foreach ($sub_places as $sub) {
             $sub_id = $sub['id'];
+
             $stmtBook = $conn->prepare("
-                SELECT hari
-                FROM reservations
-                WHERE place_id = ?
-                AND sub_place_id = ?
-                AND status = 'disetujui'
-            ");
+            SELECT hari, keterangan, jam_mulai, jam_selesai
+            FROM reservations
+            WHERE place_id = ?
+            AND sub_place_id = ?
+            AND status = 'disetujui'
+        ");
+
             $stmtBook->bind_param("ii", $place_id, $sub_id);
             $stmtBook->execute();
             $resBook = $stmtBook->get_result();
 
             while ($r = $resBook->fetch_assoc()) {
-                $booked_dates[$sub_id][] = $r['hari'];
+
+                $booked_dates[$sub_id][$r['hari']] = [
+                    'keterangan' => $r['keterangan'],
+                    'jam_mulai' => $r['jam_mulai'],
+                    'jam_selesai' => $r['jam_selesai']
+                ];
             }
         }
     } else {
+
         $stmtBook = $conn->prepare("
-            SELECT hari
-            FROM reservations
-            WHERE place_id = ?
-            AND status = 'disetujui'
-        ");
+        SELECT hari, keterangan, jam_mulai, jam_selesai
+        FROM reservations
+        WHERE place_id = ?
+        AND status = 'disetujui'
+    ");
+
         $stmtBook->bind_param("i", $place_id);
         $stmtBook->execute();
         $resBook = $stmtBook->get_result();
 
         while ($r = $resBook->fetch_assoc()) {
-            $booked_dates['main'][] = $r['hari'];
+
+            $booked_dates['main'][$r['hari']] = [
+                'keterangan' => $r['keterangan'],
+                'jam_mulai' => $r['jam_mulai'],
+                'jam_selesai' => $r['jam_selesai']
+            ];
         }
     }
 } else {
@@ -122,7 +136,7 @@ function build_calendar($month, $year, $booked_dates, $place_id, $sub_place_id =
             $calendar .= "</tr><tr>";
         }
         $date = "$year-" . str_pad($month, 2, "0", STR_PAD_LEFT) . "-" . str_pad($currentDay, 2, "0", STR_PAD_LEFT);
-        $isBooked = is_array($booked_dates) && in_array($date, $booked_dates);
+        $isBooked = isset($booked_dates[$date]);
         $today = date('Y-m-d');
         $isPast = $date < $today;
 
@@ -134,13 +148,29 @@ function build_calendar($month, $year, $booked_dates, $place_id, $sub_place_id =
             $class = 'available';
         }
 
-        if (!$isBooked && !$isPast) {
+        if ($isBooked) {
+
+            $kegiatan = htmlspecialchars($booked_dates[$date]['keterangan']);
+            $jamMulai = htmlspecialchars($booked_dates[$date]['jam_mulai']);
+            $jamSelesai = htmlspecialchars($booked_dates[$date]['jam_selesai']);
+
+            $click = "onclick=\"showBookingInfo(
+        '$date',
+        '$kegiatan',
+        '$jamMulai',
+        '$jamSelesai'
+    )\"";
+        } elseif (!$isPast) {
+
             $url = "reservasi.php?place_id=$place_id&date=$date";
+
             if ($sub_place_id != null) {
                 $url .= "&sub_place_id=$sub_place_id";
             }
-            $click = "onclick=\"window.location.href='$url'\"";
+
+            $click = "onclick=\"confirmReservation('$date','$url')\"";
         } else {
+
             $click = "";
         }
 
@@ -481,7 +511,7 @@ $bulanIndonesia = [
                                 $first = true;
                                 foreach ($sub_places as $sub):
                                 ?>
-                                    <div class="tab-pane fade <?= $first ? 'show active' : '' ?>" id="sub<?= $sub['id'] ?>">
+                                    <div class="tab-pane fade" id="sub<?= $sub['id'] ?>">
                                         <?= build_calendar($month, $year, $booked_dates[$sub['id']] ?? [], $place_id, $sub['id']); ?>
                                     </div>
                                 <?php
@@ -558,6 +588,62 @@ $bulanIndonesia = [
                 quotaBadge.style.opacity = '1';
             }, 250);
         }
+
+        function showBookingInfo(tanggal, kegiatan, jamMulai, jamSelesai) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Jadwal Sudah Terisi',
+                html: `
+            <div style="text-align:left">
+                <p><b>📅 Tanggal:</b> ${tanggal}</p>
+                <p><b>🎉 Kegiatan:</b> ${kegiatan}</p>
+                <p><b>🕒 Waktu:</b> ${jamMulai} - ${jamSelesai}</p>
+            </div>
+        `,
+                confirmButtonText: 'Tutup'
+            });
+        }
+
+        function confirmReservation(tanggal, url) {
+
+            Swal.fire({
+                title: 'Konfirmasi Reservasi',
+                text: 'Apakah Anda yakin ingin melakukan reservasi pada tanggal ' + tanggal + '?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Reservasi',
+                cancelButtonText: 'Tidak'
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    if (isLoggedIn) {
+
+                        window.location.href = url;
+
+                    } else {
+
+                        Swal.fire({
+                            title: 'Login Diperlukan',
+                            text: 'Silakan login terlebih dahulu untuk melakukan reservasi.',
+                            icon: 'warning',
+                            confirmButtonText: 'Login'
+                        }).then(() => {
+
+                            window.location.href =
+                                'login.php?redirect=' +
+                                encodeURIComponent(url);
+
+                        });
+
+                    }
+
+                }
+
+            });
+
+        }
+        const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
     </script>
 </body>
 

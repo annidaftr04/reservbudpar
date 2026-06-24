@@ -20,9 +20,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("ss", $username, $hashed_password);
 
         if ($stmt->execute()) {
+
+            $redirect = isset($_GET['redirect'])
+                ? $_GET['redirect']
+                : '';
+
             echo "<script>
-                    window.location.href = 'login.php?status=registered';
-                  </script>";
+            window.location.href =
+            'login.php?status=registered&redirect=' +
+            encodeURIComponent('$redirect');
+          </script>";
+
             exit;
         } else {
             $error = "Registrasi gagal! Username mungkin sudah digunakan.";
@@ -316,7 +324,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <!-- Navigasi Footer -->
         <div class="footer-links text-center">
-            <p class="mb-2">Sudah memiliki akun? <a href="login.php">Login di sini</a></p>
+            <p class="mb-2">Sudah memiliki akun? <a href="login.php?redirect=<?= urlencode($_GET['redirect'] ?? '') ?>">
+                    Login di sini
+                </a></p>
             <a href="index.php" style="border:none;"><i class="fas fa-house me-2"></i>Kembali ke Beranda</a>
         </div>
 

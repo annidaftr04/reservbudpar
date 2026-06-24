@@ -96,19 +96,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['hari'])) {
 
     $kode_booking = uniqid('RES-');
 
-    $nama              = $_POST['nama'];
-    $no_telepon        = $_POST['no_telepon'];
-    $email             = $_POST['email'];
+    $nama = $_POST['nama'];
 
-    $hari              = $_POST['hari'];
-    $tanggal_selesai   = $_POST['tanggal_selesai'];
+    $nama_file_user = preg_replace(
+        '/[^A-Za-z0-9]/',
+        '_',
+        trim($nama)
+    );
 
-    $jam_mulai         = $_POST['jam_mulai'];
-    $jam_selesai       = $_POST['jam_selesai'];
+    $no_telepon = $_POST['no_telepon'];
+    $email = $_POST['email'];
 
-    $keterangan        = $_POST['keterangan'];
+    $hari = $_POST['hari'];
+    $tanggal_selesai = $_POST['tanggal_selesai'];
 
-    $status            = 'pending';
+    $jam_mulai = $_POST['jam_mulai'];
+    $jam_selesai = $_POST['jam_selesai'];
+
+    $keterangan = $_POST['keterangan'];
+
+    $status = 'pending';
 
     // ambil dari URL/database baru
     $place_id_fix      = $place_id ?: null;
@@ -137,8 +144,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['hari'])) {
         return null;
     }
 
-    $file_name = uploadFile('file_upload', '../uploads/');
-    $ktp_name  = uploadFile('ktp_upload', '../uploads/ktp/');
+    $extSurat = strtolower(
+        pathinfo(
+            $_FILES['file_upload']['name'],
+            PATHINFO_EXTENSION
+        )
+    );
+
+    if ($extSurat != 'pdf') {
+
+        echo "
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Format File Tidak Valid',
+            text: 'Surat Permohonan harus berformat PDF.'
+        }).then(() => {
+            history.back();
+        });
+    </script>";
+
+        exit;
+    }
+
+    $file_name =
+        'Surat_Permohonan_' .
+        $kode_booking . '_' .
+        $nama_file_user .
+        '.pdf';
+
+    move_uploaded_file(
+        $_FILES['file_upload']['tmp_name'],
+        '../uploads/' . $file_name
+    );
+    $extKtp = pathinfo(
+        $_FILES['ktp_upload']['name'],
+        PATHINFO_EXTENSION
+    );
+
+    $ktp_name =
+        'KTP_' .
+        $kode_booking . '_' .
+        $nama_file_user .
+        '.' . $extKtp;
+
+    move_uploaded_file(
+        $_FILES['ktp_upload']['tmp_name'],
+        '../uploads/ktp/' . $ktp_name
+    );
 
     $surat_kelurahan = null;
 
@@ -150,16 +203,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['hari'])) {
             $_FILES['surat_kelurahan_upload']['error'] == 0
         ) {
 
+            $extKelurahan = strtolower(
+                pathinfo(
+                    $_FILES['surat_kelurahan_upload']['name'],
+                    PATHINFO_EXTENSION
+                )
+            );
+
+            if ($extKelurahan != 'pdf') {
+
+                echo "
+                <script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Format File Tidak Valid',
+                        text: 'Surat Kelurahan harus berformat PDF.'
+                    }).then(() => {
+                        history.back();
+                    });
+                </script>";
+
+                exit;
+            }
+
             $namaFile =
-                time() . '_' .
-                $_FILES['surat_kelurahan_upload']['name'];
+                'Surat_Kelurahan_' .
+                $kode_booking . '_' .
+                $nama_file_user .
+                '.pdf';
 
             move_uploaded_file(
                 $_FILES['surat_kelurahan_upload']['tmp_name'],
                 '../assets/doc/' . $namaFile
             );
 
-            $surat_kelurahan = $namaFile;
+            $surat_kelurahan_upload = $namaFile;
         } else {
 
             die("Surat kelurahan wajib diupload untuk Gedung Seni Budaya.");
@@ -218,42 +296,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['hari'])) {
         $status
     );
 
-
     if (!$stmt->execute()) {
         die("Execute gagal: " . $stmt->error);
     } else {
-
         require '../vendor/autoload.php';
-
         $mail = new PHPMailer(true);
-
         try {
-
             // =========================
             // CONFIG SMTP
             // =========================
-
             $mail->isSMTP();
-
             $mail->Host = 'smtp.gmail.com';
-
             $mail->SMTPAuth = true;
-
             $mail->Username = 'disbudparreservasi@gmail.com';
-
             $mail->Password = 'mvphwlcvcwiebjcf';
-
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-
             $mail->Port = 465;
 
             // DEBUG
             $mail->SMTPDebug = 0;
-
             // =========================
             // PENGIRIM
             // =========================
-
             $mail->setFrom(
                 'disbudparreservasi@gmail.com',
                 'Sistem Reservasi Disbudpar'
@@ -262,7 +326,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['hari'])) {
             // =========================
             // TUJUAN EMAIL ADMIN
             // =========================
-
             $mail->addAddress(
                 'skpbudpar@gmail.com',
                 'Admin Disbudpar'
@@ -271,20 +334,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['hari'])) {
             // =========================
             // FORMAT EMAIL
             // =========================
-
             $mail->isHTML(true);
-
             $mail->Subject =
                 'Reservasi Baru Masuk - ' . $kode_booking;
-
             // =========================
             // FORMAT TEMPAT
             // =========================
-
             $nama_tempat_email = $selected_place;
-
             if (!empty($selected_sub_place)) {
-
                 $nama_tempat_email .=
                     ' (' . $selected_sub_place . ')';
             }
@@ -292,15 +349,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['hari'])) {
             // =========================
             // ISI EMAIL
             // =========================
-
             $mail->Body = "
-
         <div style='font-family: Arial, sans-serif;'>
-
             <h2 style='color:#002D62;'>
                 Reservasi Baru Masuk
             </h2>
-
             <p>
                 Terdapat pengajuan reservasi baru
                 yang masuk ke sistem.
@@ -310,113 +363,77 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['hari'])) {
                 cellpadding='8'
                 style='border-collapse: collapse; width:100%;'
             >
-
                 <tr>
                     <td><b>Kode Booking</b></td>
                     <td>: {$kode_booking}</td>
                 </tr>
-
                 <tr>
                     <td><b>Nama Pemohon</b></td>
                     <td>: {$nama}</td>
                 </tr>
-
                 <tr>
                     <td><b>Tempat</b></td>
                     <td>: {$nama_tempat_email}</td>
                 </tr>
-
                 <tr>
                     <td><b>Tanggal</b></td>
                     <td>: {$hari} s/d {$tanggal_selesai}</td>
                 </tr>
-
                 <tr>
                     <td><b>Jam</b></td>
                     <td>: {$jam_mulai} - {$jam_selesai}</td>
                 </tr>
-
             </table>
-
             <br>
-
             <p>
                 Silakan login ke dashboard admin
                 untuk melakukan verifikasi reservasi.
             </p>
-
         </div>
-
         ";
-
             // =========================
             // KIRIM EMAIL
             // =========================
-
             $mail->send();
         } catch (Exception $e) {
-
             file_put_contents(
-
                 'email_error.txt',
-
                 $mail->ErrorInfo
-
             );
         }
-
         // =========================
         // ALERT SUKSES
         // =========================
-
         echo "
-
     <script>
-
         window.onload = function() {
-
             Swal.fire(
-
                 'Berhasil!',
-
                 'Reservasi Anda telah diajukan.',
-
                 'success'
-
             ).then(() => {
-
                 window.location.href='dashboard.php';
-
             });
-
         };
-
     </script>
-
     ";
     }
     $stmt->close();
 }
-
 // Ambil Tanggal Terisi (Booked)
 $booked_dates = [];
-
 if ($place_id != '') {
-
     $sqlBooked = "
         SELECT hari
         FROM reservations
         WHERE place_id = ?
         AND status = 'disetujui'
     ";
-
     if ($sub_place_id != '') {
 
         $sqlBooked .= " AND sub_place_id = ?";
     }
-
     $stmtB = $conn->prepare($sqlBooked);
-
     if ($sub_place_id != '') {
 
         $stmtB->bind_param("ii", $place_id, $sub_place_id);
@@ -426,11 +443,8 @@ if ($place_id != '') {
     }
 
     $stmtB->execute();
-
     $resB = $stmtB->get_result();
-
     while ($r = $resB->fetch_assoc()) {
-
         $booked_dates[] = $r['hari'];
     }
 }
@@ -656,7 +670,6 @@ function build_calendar_custom($month, $year, $booked_dates, $selected_date)
 </head>
 
 <body>
-
     <div class="container main-container">
         <div class="glass-card">
             <div class="sidebar-info">
@@ -665,9 +678,74 @@ function build_calendar_custom($month, $year, $booked_dates, $selected_date)
                 </a>
 
                 <h2 class="fw-extrabold mb-4" style="font-weight: 800;">Pilih Jadwal</h2>
-                <p class="opacity-75 small mb-5">Silakan tentukan tanggal mulai acara Anda pada kalender di bawah ini.</p>
+                <p class="opacity-75 small mb-5">
+                    Silakan tentukan tanggal mulai acara Anda pada kalender di bawah ini.
+                </p>
 
-                <?= build_calendar_custom(5, 2026, $booked_dates, $selected_date); ?>
+                <?php
+
+                $currentMonth = isset($_GET['month'])
+                    ? (int)$_GET['month']
+                    : date('n', strtotime($selected_date));
+
+                $currentYear = isset($_GET['year'])
+                    ? (int)$_GET['year']
+                    : date('Y', strtotime($selected_date));
+
+                $prevMonth = $currentMonth - 1;
+                $prevYear = $currentYear;
+
+                if ($prevMonth < 1) {
+                    $prevMonth = 12;
+                    $prevYear--;
+                }
+
+                $nextMonth = $currentMonth + 1;
+                $nextYear = $currentYear;
+
+                if ($nextMonth > 12) {
+                    $nextMonth = 1;
+                    $nextYear++;
+                }
+
+                $todayMonth = date('n');
+                $todayYear = date('Y');
+
+                $disablePrev =
+                    ($prevYear < $todayYear) ||
+                    ($prevYear == $todayYear && $prevMonth < $todayMonth);
+
+                ?>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <?php if (!$disablePrev): ?>
+                        <a class="btn btn-sm btn-outline-light"
+                            href="?place_id=<?= $place_id ?>&sub_place_id=<?= $sub_place_id ?>&date=<?= $selected_date ?>&month=<?= $prevMonth ?>&year=<?= $prevYear ?>">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    <?php else: ?>
+                        <button class="btn btn-sm btn-outline-light" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    <?php endif; ?>
+
+                    <span class="fw-bold text-white">
+                        <?= date('F Y', mktime(0, 0, 0, $currentMonth, 1, $currentYear)) ?>
+                    </span>
+
+                    <a class="btn btn-sm btn-outline-light"
+                        href="?place_id=<?= $place_id ?>&sub_place_id=<?= $sub_place_id ?>&date=<?= $selected_date ?>&month=<?= $nextMonth ?>&year=<?= $nextYear ?>">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+
+                <?= build_calendar_custom(
+                    $currentMonth,
+                    $currentYear,
+                    $booked_dates,
+                    $selected_date
+                ); ?>
+
 
                 <div class="mt-5 pt-4 border-top border-white border-opacity-10">
                     <h6 class="fw-bold mb-3"><i class="fas fa-location-dot me-2 text-accent"></i>Lokasi Terpilih</h6>
@@ -768,11 +846,13 @@ function build_calendar_custom($month, $year, $booked_dates, $selected_date)
                                 <span class="text-danger">*</span>
                             </label>
                             <div class="small text-muted mb-2">
-                                Upload surat permohonan kegiatan resmi.
+                                Upload surat permohonan kegiatan resmi (Format PDF).
                             </div>
+
                             <input type="file"
                                 class="form-control"
                                 name="file_upload"
+                                accept=".pdf,application/pdf"
                                 required>
                             <!-- TEMPLATE -->
                             <div class="mt-2">
@@ -798,7 +878,8 @@ function build_calendar_custom($month, $year, $booked_dates, $selected_date)
                             <input type="file"
                                 class="form-control"
                                 name="surat_kelurahan_upload"
-                                id="input_kelurahan">
+                                id="input_kelurahan"
+                                accept=".pdf,application/pdf">
                             <!-- TEMPLATE -->
                             <div class="mt-2">
                                 <a href="../assets/doc/Surat_keterangan_kelurahan.docx"
@@ -854,8 +935,8 @@ function build_calendar_custom($month, $year, $booked_dates, $selected_date)
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            const initialPlace = "<?= $selected_place ?>";
-            if (initialPlace) checkKelurahanRequirement(initialPlace);
+            const initialPlaceId = "<?= $place_id ?>";
+            checkKelurahanRequirement(initialPlaceId);
         });
 
         document.querySelectorAll(".day-num.available").forEach(td => {
