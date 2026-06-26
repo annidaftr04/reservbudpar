@@ -345,6 +345,7 @@ $totalTempatAktif = count(array_unique($tempatAktif));
     <nav>
         <a href="dashboard_admin.php" class="nav-link"><i class="fa-solid fa-house"></i> Dashboard</a>
         <a href="kelola_reserv.php" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Reservasi</a>
+        <a href="kelola_surat.php" class="nav-link"><i class="fa-solid fa-map-location-dot"></i> Kelola Surat</a>
         <a href="kelola_tempat.php" class="nav-link"><i class="fa-solid fa-map-location-dot"></i> Kelola Tempat</a>
         <a href="calendar.php" class="nav-link active"><i class="fa-solid fa-calendar-days"></i> Kalender</a>
         <div style="margin: 2rem 0;"><hr style="opacity: 0.1;"></div>

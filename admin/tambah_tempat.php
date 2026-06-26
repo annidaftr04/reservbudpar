@@ -222,6 +222,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="mt-4">
             <a href="dashboard_admin.php" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
             <a href="kelola_reserv.php" class="nav-link "><i class="fas fa-calendar-check"></i> Reservasi</a>
+            <a href="kelola_surat.php" class="nav-link"><i class="fas fa-map-location-dot"></i> Kelola Surat</a>
             <a href="kelola_tempat.php" class="nav-link active"><i class="fas fa-map-marked-alt"></i> Kelola Tempat</a>
             <a href="calendar.php" class="nav-link"><i class="fas fa-calendar-alt"></i> Kalender</a>
             <hr class="mx-3">
