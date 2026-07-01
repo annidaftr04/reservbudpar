@@ -1,15 +1,6 @@
 <?php
-session_start();
+include 'includes/auth.php';
 include '../db.php';
-
-// ======================================================
-// CEK LOGIN ADMIN
-// ======================================================
-
-if (!isset($_SESSION['admin_id'])) {
-    header('Location: login_admin.php');
-    exit;
-}
 
 // ======================================================
 // CEK ID RESERVASI
@@ -99,204 +90,22 @@ if (!$resultPlaces) {
 <html lang="id">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Edit Reservasi | TNG Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <?php include 'includes/header.php'; ?>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-    <link rel="icon" href="../assets/img/logotng.png" type="image/x-icon">
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --bg: #f8fafc;
-            --sidebar-color: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-        }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            overflow-x: hidden;
-        }
-
-        /* Sidebar Styling */
-        .sidebar {
-            width: 280px;
-            height: 100vh;
-            background: var(--sidebar-color);
-            position: fixed;
-            border-right: 1px solid rgba(0, 0, 0, 0.05);
-            z-index: 1100;
-            padding: 2.5rem 1.5rem;
-        }
-
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding-bottom: 2.5rem;
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--primary);
-            letter-spacing: -1px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 14px 1rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 600;
-            border-radius: 14px;
-            transition: 0.3s;
-            margin-bottom: 8px;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 10px 20px -5px rgba(67, 97, 238, 0.4);
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 280px;
-            flex: 1;
-            padding: 3rem;
-            min-height: 100vh;
-        }
-
-        .glass-header {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(15px);
-            padding: 2rem;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            margin-bottom: 2.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
-        }
-
-        .content-card {
-            background: white;
-            border-radius: 30px;
-            padding: 3rem;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0, 0, 0, 0.01);
-        }
-
-        .form-label {
-            font-weight: 700;
-            color: var(--text-main);
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-        }
-
-        .form-control,
-        .form-select {
-            border-radius: 14px;
-            padding: 14px 18px;
-            border: 2.5px solid #f1f5f9;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            background: #f8fafc;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 5px rgba(67, 97, 238, 0.08);
-            outline: none;
-        }
-
-        .booking-tag {
-            background: rgba(67, 97, 238, 0.1);
-            color: var(--primary);
-            padding: 5px 15px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.8rem;
-        }
-
-        .btn-modern {
-            padding: 14px 35px;
-            border-radius: 16px;
-            font-weight: 700;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-save-md {
-            background: var(--primary);
-            color: white;
-            border: none;
-        }
-
-        .btn-save-md:hover {
-            background: #3651d4;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.2);
-        }
-
-        .btn-cancel-md {
-            background: #e2e8f0;
-            color: #64748b;
-            text-decoration: none;
-        }
-
-        .btn-cancel-md:hover {
-            background: #cbd5e1;
-            transform: translateY(-3px);
-        }
-
-        @media (max-width: 992px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 1.5rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/sidebar.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/edit_reservasi.css">
 </head>
 
 <body>
-    <aside class="sidebar">
-        <div class="sidebar-brand">
-            <img src="../assets/img/logotng.png" width="35" alt="Logo">
-            <span>Admin Reservasi</span>
-        </div>
-        <nav>
-            <a href="dashboard_admin.php" class="nav-link"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <a href="kelola_reserv.php" class="nav-link active"><i class="fa-solid fa-calendar-check"></i> Reservasi</a>
-            <a href="kelola_surat.php" class="nav-link"><i class="fa-solid fa-map-location-dot"></i> Kelola Surat</a>
-            <a href="kelola_tempat.php" class="nav-link"><i class="fa-solid fa-map-location-dot"></i> Kelola Tempat</a>
-            <a href="calendar.php" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Kalender</a>
-            <div style="margin: 2rem 0;">
-                <hr style="opacity: 0.1;">
-            </div>
-            <a href="logout_admin.php" class="nav-link text-danger" onclick="confirmAdminLogout(event)"><i class="fas fa-sign-out-alt"></i>Logout</a>
-        </nav>
-    </aside>
-
+    <?php include 'includes/sidebar.php'; ?>
     <main class="main-content animate__animated animate__fadeIn">
         <header class="glass-header">
             <div>
@@ -429,6 +238,8 @@ if (!$resultPlaces) {
             </form>
         </div>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/admin.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function confirmSave() {
@@ -661,35 +472,6 @@ if (!$resultPlaces) {
                         text: 'Server error'
                     });
                 });
-        }
-
-        function confirmAdminLogout(event) {
-            event.preventDefault();
-            Swal.fire({
-                title: 'Logout Admin?',
-                text: 'Anda yakin ingin keluar dari dashboard admin?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, Logout',
-                cancelButtonText: 'Batal',
-                borderRadius: '20px'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Sedang logout...',
-                        text: 'Mohon tunggu sebentar',
-                        icon: 'success',
-                        timer: 1200,
-                        showConfirmButton: false,
-                        allowOutsideClick: false
-                    });
-                    setTimeout(() => {
-                        window.location.href = 'logout_admin.php';
-                    }, 1200);
-                }
-            });
         }
     </script>
 

@@ -1,0 +1,110 @@
+:root {
+  --primary: #4361ee;
+  --secondary: #3f37c9;
+  --bg: #f8fafc;
+  --sidebar-color: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+}
+
+/* Main Content */
+.main-content {
+  margin-left: 280px;
+  flex: 1;
+  padding: 3rem;
+  min-height: 100vh;
+}
+
+.glass-header {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(15px);
+  padding: 2rem;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  margin-bottom: 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+}
+
+.content-card {
+  background: white;
+  border-radius: 30px;
+  padding: 3rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.01);
+}
+
+.form-label {
+  font-weight: 700;
+  color: var(--text-main);
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.form-control,
+.form-select {
+  border-radius: 14px;
+  padding: 14px 18px;
+  border: 2.5px solid #f1f5f9;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: #f8fafc;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 5px rgba(67, 97, 238, 0.08);
+  outline: none;
+}
+
+.booking-tag {
+  background: rgba(67, 97, 238, 0.1);
+  color: var(--primary);
+  padding: 5px 15px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.btn-modern {
+  padding: 14px 35px;
+  border-radius: 16px;
+  font-weight: 700;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-save-md {
+  background: var(--primary);
+  color: white;
+  border: none;
+}
+
+.btn-save-md:hover {
+  background: #3651d4;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(67, 97, 238, 0.2);
+}
+
+.btn-cancel-md {
+  background: #e2e8f0;
+  color: #64748b;
+  text-decoration: none;
+}
+
+.btn-cancel-md:hover {
+  background: #cbd5e1;
+  transform: translateY(-3px);
+}
+
+@media (max-width: 992px) {
+  .main-content {
+    padding: 1.5rem;
+  }
+}

@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name        = trim($_POST['name']);
     $description = trim($_POST['description']);
     $lokasi      = trim($_POST['lokasi']);
-    $imagePath   = ''; 
+    $imagePath   = '';
     $upload_success = false;
 
     // Cek apakah ada gambar utama
@@ -81,15 +81,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tambah Tempat Baru | Admin Panel</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link rel="icon" href="../assets/img/logotng.png" type="image/x-icon">
 
     <style>
@@ -115,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             height: 100vh;
             background: white;
             position: fixed;
-            border-right: 1px solid rgba(0,0,0,0.05);
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
             z-index: 1000;
             padding: 2rem 1rem;
         }
@@ -144,7 +145,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 5px;
         }
 
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover,
+        .nav-link.active {
             background: var(--primary);
             color: white;
             box-shadow: 0 10px 15px -3px rgba(67, 97, 238, 0.3);
@@ -152,66 +154,131 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         /* Content Area */
-        .main-content { margin-left: 280px; flex: 1; padding: 3rem; min-height: 100vh; }
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 3rem;
+            min-height: 100vh;
+        }
 
         .glass-header {
-            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);
-            padding: 2rem; border-radius: 24px; border: 1px solid rgba(255,255,255,0.5);
-            margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .content-card {
-            background: white; border-radius: 30px; padding: 3rem;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.04);
+            background: white;
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
         }
 
-        .form-label { font-weight: 700; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; }
-        
+        .form-label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
         .form-control {
-            border-radius: 14px; padding: 14px 18px; border: 2.5px solid #f1f5f9;
-            font-weight: 500; transition: 0.3s; background: #f8fafc;
+            border-radius: 14px;
+            padding: 14px 18px;
+            border: 2.5px solid #f1f5f9;
+            font-weight: 500;
+            transition: 0.3s;
+            background: #f8fafc;
         }
 
-        .form-control:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 5px rgba(67, 97, 238, 0.08); }
+        .form-control:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 5px rgba(67, 97, 238, 0.08);
+        }
 
         /* Upload Area */
         .upload-area {
-            border: 3px dashed #e2e8f0; border-radius: 20px;
-            padding: 2.5rem; text-align: center; cursor: pointer;
-            transition: 0.3s; background: #ffffff; margin-bottom: 1.5rem;
+            border: 3px dashed #e2e8f0;
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            background: #ffffff;
+            margin-bottom: 1.5rem;
         }
-        .upload-area:hover { border-color: var(--primary); background: rgba(67, 97, 238, 0.02); }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.02);
+        }
 
         #mainPreview {
-            width: 100%; height: 250px; object-fit: cover;
-            border-radius: 18px; display: none; margin-top: 1rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 18px;
+            display: none;
+            margin-top: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
         .gallery-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 1rem; margin-top: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
 
         .gallery-preview-box {
-            border-radius: 12px; overflow: hidden; aspect-ratio: 1;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
-        .gallery-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        .gallery-preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
         .btn-submit {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white; border: none; padding: 16px 40px;
-            border-radius: 18px; font-weight: 800; transition: 0.3s;
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 18px;
+            font-weight: 800;
+            transition: 0.3s;
         }
-        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3); color: white; }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3);
+            color: white;
+        }
 
         @media (max-width: 992px) {
-            .sidebar { transform: translateX(-100%); }
-            .main-content { margin-left: 0; padding: 1.5rem; }
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <nav class="sidebar" id="sidebar">
@@ -222,11 +289,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="mt-4">
             <a href="dashboard_admin.php" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
             <a href="kelola_reserv.php" class="nav-link "><i class="fas fa-calendar-check"></i> Reservasi</a>
-            <a href="kelola_surat.php" class="nav-link"><i class="fas fa-map-location-dot"></i> Kelola Surat</a>
+            <a href="kelola_surat.php" class="nav-link"><i class="fas fa-file-invoice"></i> Kelola Surat</a>
             <a href="kelola_tempat.php" class="nav-link active"><i class="fas fa-map-marked-alt"></i> Kelola Tempat</a>
             <a href="calendar.php" class="nav-link"><i class="fas fa-calendar-alt"></i> Kalender</a>
             <hr class="mx-3">
-            <a href="logout_admin.php"class="nav-link text-danger"onclick="confirmAdminLogout(event)"><i class="fas fa-sign-out-alt"></i>Logout</a>
+            <a href="logout_admin.php" class="nav-link text-danger" onclick="confirmAdminLogout(event)"><i class="fas fa-sign-out-alt"></i>Logout</a>
         </div>
     </nav>
 
@@ -348,34 +415,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             });
         }
+
         function confirmAdminLogout(event) {
             event.preventDefault();
             Swal.fire({
-            title: 'Logout Admin?',
-            text: 'Anda yakin ingin keluar dari dashboard admin?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Ya, Logout',
-            cancelButtonText: 'Batal',
-            borderRadius: '20px'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Sedang logout...',
-                    text: 'Mohon tunggu sebentar',
-                    icon: 'success',
-                    timer: 1200,
-                    showConfirmButton: false,
-                    allowOutsideClick: false
-                });
-            setTimeout(() => {
-                window.location.href = 'logout_admin.php';
+                title: 'Logout Admin?',
+                text: 'Anda yakin ingin keluar dari dashboard admin?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Logout',
+                cancelButtonText: 'Batal',
+                borderRadius: '20px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Sedang logout...',
+                        text: 'Mohon tunggu sebentar',
+                        icon: 'success',
+                        timer: 1200,
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                    });
+                    setTimeout(() => {
+                        window.location.href = 'logout_admin.php';
                     }, 1200);
                 }
             });
         }
     </script>
 </body>
+
 </html>

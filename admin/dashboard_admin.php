@@ -1,12 +1,6 @@
 <?php
+include 'includes/auth.php';
 include '../db.php';
-session_start();
-
-// Cek apakah admin sudah login
-if (!isset($_SESSION['admin_id'])) {
-    header('Location: login_admin.php');
-    exit;
-}
 
 // Data Admin dari Sesi
 $adminName = isset($_SESSION['admin_data']['nama']) ? $_SESSION['admin_data']['nama'] : 'Administrator';
@@ -74,175 +68,18 @@ $recentReservations = $conn->query("
 <html lang="id">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Modern Admin Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="icon" href="../assets/img/logotng.png" type="image/x-icon">
 
-    <style>
-        :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --danger: #f72585;
-            --warning: #ff9f1c;
-            --dark: #212529;
-            --light-bg: #f8f9fc;
-            --sidebar-color: #ffffff;
-        }
+    <?php include 'includes/header.php'; ?>
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--light-bg);
-            color: #4a4a4a;
-        }
-
-        /* Sidebar Styling */
-        .sidebar {
-            width: 280px;
-            height: 100vh;
-            background: var(--sidebar-color);
-            position: fixed;
-            border-right: 1px solid rgba(0, 0, 0, 0.05);
-            z-index: 1100;
-            padding: 2.5rem 1.5rem;
-        }
-
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding-bottom: 2.5rem;
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--primary);
-            letter-spacing: -1px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 14px 1rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 600;
-            border-radius: 14px;
-            transition: 0.3s;
-            margin-bottom: 8px;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 10px 20px -5px rgba(67, 97, 238, 0.4);
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 260px;
-            padding: 2rem;
-            transition: all 0.3s;
-        }
-
-        /* Stats Cards */
-        .stat-card {
-            border: none;
-            border-radius: 15px;
-            padding: 1.5rem;
-            background: #fff;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
-            transition: transform 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-        }
-
-        .bg-light-primary {
-            background: rgba(67, 97, 238, 0.1);
-            color: var(--primary);
-        }
-
-        .bg-light-success {
-            background: rgba(76, 201, 240, 0.1);
-            color: #08a1d4;
-        }
-
-        .bg-light-warning {
-            background: rgba(255, 159, 28, 0.1);
-            color: var(--warning);
-        }
-
-        .bg-light-danger {
-            background: rgba(247, 37, 133, 0.1);
-            color: var(--danger);
-        }
-
-        .table-responsive {
-            background: #fff;
-            border-radius: 15px;
-            padding: 1rem;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.05);
-        }
-
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        @media (max-width: 992px) {
-            .sidebar {
-                margin-left: -260px;
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .sidebar.active {
-                margin-left: 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/sidebar.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
 </head>
-<body>
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
-            <img src="../assets/img/logotng.png" width="35" alt="Logo">
-            <span>Admin Reservasi</span>
-        </div>
-        <div class="mt-4">
-            <a href="#" class="nav-link active"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="kelola_reserv.php" class="nav-link"><i class="fas fa-calendar-check"></i> Reservasi</a>
-            <a href="kelola_surat.php" class="nav-link"><i class="fas fa-map-marked-alt"></i> Kelola Surat</a>
-            <a href="kelola_tempat.php" class="nav-link"><i class="fas fa-map-marked-alt"></i> Kelola Tempat</a>
-            <a href="calendar.php" class="nav-link"><i class="fas fa-calendar-alt"></i> Kalender</a>
-            <div style="margin: 2rem 0;">
-                <hr style="opacity: 0.1;">
-            </div>
-            <a href="logout_admin.php" class="nav-link text-danger" onclick="confirmAdminLogout(event)"><i class="fas fa-sign-out-alt"></i>Logout</a>
-        </div>
-    </nav>
 
+<body>
+    <?php include 'includes/sidebar.php'; ?>
     <div class="main-content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -375,6 +212,7 @@ $recentReservations = $conn->query("
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../assets/js/admin.js"></script>
     <script>
         // Chart Status (Doughnut)
         const ctxStatus = document.getElementById('statusChart').getContext('2d');
@@ -472,35 +310,7 @@ $recentReservations = $conn->query("
                 }
             }
         });
-
-        function confirmAdminLogout(event) {
-            event.preventDefault();
-            Swal.fire({
-                title: 'Logout Admin?',
-                text: 'Anda yakin ingin keluar dari dashboard admin?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, Logout',
-                cancelButtonText: 'Batal',
-                borderRadius: '20px'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Sedang logout...',
-                        text: 'Mohon tunggu sebentar',
-                        icon: 'success',
-                        timer: 1200,
-                        showConfirmButton: false,
-                        allowOutsideClick: false
-                    });
-                    setTimeout(() => {
-                        window.location.href = 'logout_admin.php';
-                    }, 1200);
-                }
-            });
-        }
     </script>
 </body>
+
 </html>

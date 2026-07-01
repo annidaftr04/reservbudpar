@@ -1,10 +1,5 @@
 <?php
-session_start();
-if (!isset($_SESSION['admin_id'])) {
-    header('Location: login_admin.php');
-    exit;
-}
-
+include 'includes/auth.php';
 include '../db.php';
 
 // Inisialisasi variabel pencarian
@@ -98,182 +93,21 @@ $total_pages = ceil($total_data / $items_per_page);
 <html lang="id">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Kelola Reservasi | Admin Panel</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="icon" href="../assets/img/logotng.png" type="image/x-icon">
+    <?php include 'includes/header.php'; ?>
 
-    <style>
-        :root {
-            --primary: #4361ee;
-            --navy: #1e293b;
-            --light-bg: #f8f9fc;
-            --sidebar-color: #ffffff;
-        }
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--light-bg);
-            color: #334155;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 280px;
-            height: 100vh;
-            background: var(--sidebar-color);
-            position: fixed;
-            border-right: 1px solid rgba(0, 0, 0, 0.05);
-            z-index: 1100;
-            padding: 2.5rem 1.5rem;
-        }
-
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding-bottom: 2.5rem;
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--primary);
-            letter-spacing: -1px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 14px 1rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 600;
-            border-radius: 14px;
-            transition: 0.3s;
-            margin-bottom: 8px;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 10px 20px -5px rgba(67, 97, 238, 0.4);
-        }
-
-        .main-content {
-            margin-left: 260px;
-            padding: 2rem;
-        }
-
-        .filter-card {
-            background: #fff;
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .form-control,
-        .form-select {
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            padding: 0.6rem 1rem;
-        }
-
-        .table-card {
-            background: #fff;
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .table thead {
-            background: #f1f5f9;
-        }
-
-        .table thead th {
-            padding: 1.2rem;
-            font-weight: 700;
-            color: #475569;
-            border: none;
-        }
-
-        .table tbody td {
-            padding: 1.2rem;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .status-badge {
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .status-pending {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .status-disetujui {
-            background: #dcfce7;
-            color: #16a34a;
-        }
-
-        .status-ditolak {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .status-selesai {
-            background: #e0e7ff;
-            color: #4338ca;
-        }
-
-        .btn-action {
-            width: 35px;
-            height: 35px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            transition: 0.2s;
-        }
-
-        @media (max-width: 992px) {
-            .sidebar {
-                margin-left: -260px;
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/sidebar.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/kelola_reserv.css">
 </head>
 
 <body>
-
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
-            <img src="../assets/img/logotng.png" width="35" alt="Logo">
-            <span>Admin Reservasi</span>
-        </div>
-        <div class="mt-4">
-            <a href="dashboard_admin.php" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="kelola_reserv.php" class="nav-link active"><i class="fas fa-calendar-check"></i> Reservasi</a>
-            <a href="kelola_surat.php" class="nav-link"><i class="fas fa-map-location-dot"></i> Kelola Surat</a>
-            <a href="kelola_tempat.php" class="nav-link"><i class="fas fa-map-marked-alt"></i> Kelola Tempat</a>
-            <a href="calendar.php" class="nav-link"><i class="fas fa-calendar-alt"></i> Kalender</a>
-            <hr class="mx-3">
-            <a href="logout_admin.php" class="nav-link text-danger" onclick="confirmAdminLogout(event)"><i class="fas fa-sign-out-alt"></i>Logout</a>
-        </div>
-    </nav>
-
+    <?php include 'includes/sidebar.php'; ?>
     <div class="main-content">
         <h4 class="fw-bold mb-4">Kelola Data Reservasi</h4>
 
@@ -452,6 +286,8 @@ $total_pages = ceil($total_data / $items_per_page);
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../assets/js/admin.js"></script>
+
     <script>
         $(document).on('click', '.delete-reservation', function() {
             const id = $(this).data("id");
@@ -484,35 +320,6 @@ $total_pages = ceil($total_data / $items_per_page);
                 }
             });
         });
-
-        function confirmAdminLogout(event) {
-            event.preventDefault();
-            Swal.fire({
-                title: 'Logout Admin?',
-                text: 'Anda yakin ingin keluar dari dashboard admin?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, Logout',
-                cancelButtonText: 'Batal',
-                borderRadius: '20px'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Sedang logout...',
-                        text: 'Mohon tunggu sebentar',
-                        icon: 'success',
-                        timer: 1200,
-                        showConfirmButton: false,
-                        allowOutsideClick: false
-                    });
-                    setTimeout(() => {
-                        window.location.href = 'logout_admin.php';
-                    }, 1200);
-                }
-            });
-        }
     </script>
 </body>
 

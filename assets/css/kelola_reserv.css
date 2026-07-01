@@ -1,0 +1,95 @@
+:root {
+  --primary: #4361ee;
+  --navy: #1e293b;
+  --light-bg: #f8f9fc;
+  --bg: #dddfe6ad;
+}
+
+.main-content {
+  margin-left: 260px;
+  padding: 2rem;
+  min-height: 100vh;
+  background-color: var(--bg);
+}
+
+.filter-card {
+  background: #fff;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.form-control,
+.form-select {
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  padding: 0.6rem 1rem;
+}
+
+.table-card {
+  background: #fff;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.table thead {
+  background: #f1f5f9;
+}
+
+.table thead th {
+  padding: 1.2rem;
+  font-weight: 700;
+  color: #475569;
+  border: none;
+}
+
+.table tbody td {
+  padding: 1.2rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.status-disetujui {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.status-ditolak {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.status-selesai {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.btn-action {
+  width: 35px;
+  height: 35px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  transition: 0.2s;
+}
+
+@media (max-width: 992px) {
+  .main-content {
+    padding: 1.5rem;
+  }
+}

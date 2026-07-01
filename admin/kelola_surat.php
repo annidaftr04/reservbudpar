@@ -25,9 +25,9 @@ $totalDisetujui = 0;
 $today = date('Y-m-d');
 
 // Tampung data untuk dilooping di table biar query tidak jebol pas di-loop ganda
-$reservations_list = [];
-if ($total_data = $result_total = $query->num_rows > 0) {
-    while ($row = $result_brand = $query->fetch_assoc()) {
+$reservations = [];
+if ($query->num_rows > 0) {
+    while ($row = $query->fetch_assoc()) {
         $reservations[] = $row;
         if ($row['status'] == 'disetujui') {
             $totalDisetujui++;
@@ -53,12 +53,10 @@ $totalTolak = mysqli_num_rows(mysqli_query(
 
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manajemen Arsip Dokumen Surat | TNG Admin</title>
-
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -78,7 +76,6 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             --gradient-3: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             --gradient-4: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
         }
-
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f1f5f9;
@@ -86,7 +83,6 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             margin: 0;
             display: flex;
         }
-
         /* Sidebar Base Frame */
         .sidebar {
             width: 280px;
@@ -97,7 +93,6 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             z-index: 1100;
             padding: 2.5rem 1.5rem;
         }
-
         .sidebar-brand {
             display: flex;
             align-items: center;
@@ -108,7 +103,6 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             color: var(--primary);
             letter-spacing: -1px;
         }
-
         .nav-link {
             display: flex;
             align-items: center;
@@ -121,14 +115,12 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             transition: 0.3s;
             margin-bottom: 8px;
         }
-
         .nav-link:hover,
         .nav-link.active {
             background: var(--primary);
             color: white;
             box-shadow: 0 10px 20px -5px rgba(67, 97, 238, 0.4);
         }
-
         /* Main Workspace Wrapper */
         .main-content {
             margin-left: 280px;
@@ -136,7 +128,6 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             padding: 3rem;
             min-height: 100vh;
         }
-
         .glass-header {
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(15px);
@@ -149,7 +140,6 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             align-items: center;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
         }
-
         /* Statistik Berwarna */
         .stats-grid {
             display: grid;
@@ -157,7 +147,6 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             gap: 20px;
             margin-bottom: 2.5rem;
         }
-
         .stat-card {
             border-radius: 22px;
             padding: 25px;
@@ -167,12 +156,10 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             color: white;
             transition: 0.3s;
         }
-
         .stat-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
         }
-
         .stat-card h3 {
             font-size: 36px;
             font-weight: 800;
@@ -180,14 +167,12 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             color: white;
             letter-spacing: -1px;
         }
-
         .stat-card p {
             margin: 5px 0 0;
             color: rgba(255, 255, 255, 0.85);
             font-size: 14px;
             font-weight: 600;
         }
-
         .stat-card i {
             position: absolute;
             right: 20px;
@@ -195,7 +180,6 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             font-size: 32px;
             color: rgba(255, 255, 255, 0.22);
         }
-
         /* Filter Controls */
         .filter-card {
             background: white;
@@ -205,7 +189,6 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
             margin-bottom: 2rem;
         }
-
         .form-control,
         .form-select {
             border-radius: 12px;
@@ -215,7 +198,6 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             font-weight: 500;
             transition: 0.3s;
         }
-
         .form-control:focus,
         .form-select:focus {
             border-color: var(--primary);
@@ -223,7 +205,6 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.08);
             outline: none;
         }
-
         .btn-search {
             background: var(--primary);
             color: white;
@@ -233,13 +214,11 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             font-weight: 700;
             transition: 0.2s;
         }
-
         .btn-search:hover {
             background: var(--secondary);
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(67, 97, 238, 0.2);
         }
-
         /* Data Workspace Table */
         .table-wrapper-card {
             background: white;
@@ -248,12 +227,10 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             border: none;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
         }
-
         .table {
             margin-bottom: 0;
             vertical-align: middle;
         }
-
         .table th {
             background: #f8fafc !important;
             color: var(--muted-gray);
@@ -264,14 +241,12 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             padding: 16px;
             border-bottom: 2px solid #edf2f7;
         }
-
         .table td {
             padding: 16px;
             border-bottom: 1px solid #edf2f7;
             font-weight: 500;
             font-size: 0.92rem;
         }
-
         /* Badges Style */
         .badge-status {
             padding: 6px 14px;
@@ -281,31 +256,26 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             display: inline-block;
             text-transform: uppercase;
         }
-
         .bg-disetujui {
             background: rgba(16, 185, 129, 0.1);
             color: #10b981;
             border: 1px solid rgba(16, 185, 129, 0.15);
         }
-
         .bg-ditolak {
             background: rgba(239, 68, 68, 0.1);
             color: #ef4444;
             border: 1px solid rgba(239, 68, 68, 0.15);
         }
-
         .bg-pending {
             background: rgba(245, 158, 11, 0.1);
             color: #f59e0b;
             border: 1px solid rgba(245, 158, 11, 0.15);
         }
-
         .bg-selesai {
             background: rgba(6, 182, 212, 0.1);
             color: #06b6d4;
             border: 1px solid rgba(6, 182, 212, 0.15);
         }
-
         /* Indicator Check/Cross Icons */
         .doc-indicator {
             font-size: 1.15rem;
@@ -313,15 +283,12 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             align-items: center;
             justify-content: center;
         }
-
         .doc-check {
             color: #10b981;
         }
-
         .doc-cross {
             color: #cbd5e1;
         }
-
         .btn-detail-premium {
             background: rgba(67, 97, 238, 0.08);
             color: var(--primary);
@@ -332,19 +299,16 @@ $totalTolak = mysqli_num_rows(mysqli_query(
             border: none;
             transition: 0.2s;
         }
-
         .btn-detail-premium:hover {
             background: var(--primary);
             color: white;
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(67, 97, 238, 0.15);
         }
-
         @media (max-width: 991px) {
             .sidebar {
                 transform: translateX(-100%);
             }
-
             .main-content {
                 margin-left: 0;
                 padding: 1.5rem;
@@ -352,9 +316,7 @@ $totalTolak = mysqli_num_rows(mysqli_query(
         }
     </style>
 </head>
-
 <body>
-
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <img src="../assets/img/logotng.png" width="35" alt="Logo">
@@ -470,34 +432,54 @@ $totalTolak = mysqli_num_rows(mysqli_query(
                                     </td>
                                     <td class="text-center">
                                         <?php if (!empty($row['file_upload'])) : ?>
-                                            <a href="../uploads/<?= $row['file_upload']; ?>"
-                                                target="_blank"
-                                                class="btn btn-info btn-sm"
-                                                title="Preview">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="../uploads/<?= $row['file_upload']; ?>"
-                                                download
-                                                class="btn btn-success btn-sm"
-                                                title="Download">
-                                                <i class="fas fa-download"></i>
-                                            </a>
+                                            <div class="mb-2">
+                                                <a href="../uploads/<?= $row['file_upload']; ?>"
+                                                    target="_blank"
+                                                    class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="../uploads/<?= $row['file_upload']; ?>"
+                                                    download
+                                                    class="btn btn-success btn-sm">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                            </div>
+                                            <?php if (!empty($row['nomor_surat_permohonan'])) : ?>
+                                                <small class="fw-bold text-primary d-block">
+                                                    <?= htmlspecialchars($row['nomor_surat_permohonan']); ?>
+                                                </small>
+                                            <?php else : ?>
+                                                <small class="text-danger d-block">
+                                                    Belum Diisi
+                                                </small>
+                                            <?php endif; ?>
                                         <?php else : ?>
                                             <span class="text-muted">-</span>
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-center">
                                         <?php if (!empty($row['surat_kelurahan_upload'])) : ?>
-                                            <a href="../uploads/kelurahan/<?= $row['surat_kelurahan_upload']; ?>"
-                                                target="_blank"
-                                                class="btn btn-info btn-sm">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="../uploads/kelurahan/<?= $row['surat_kelurahan_upload']; ?>"
-                                                download
-                                                class="btn btn-success btn-sm">
-                                                <i class="fas fa-download"></i>
-                                            </a>
+                                            <div class="mb-2">
+                                                <a href="../uploads/kelurahan/<?= $row['surat_kelurahan_upload']; ?>"
+                                                    target="_blank"
+                                                    class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="../uploads/kelurahan/<?= $row['surat_kelurahan_upload']; ?>"
+                                                    download
+                                                    class="btn btn-success btn-sm">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                            </div>
+                                            <?php if (!empty($row['nomor_surat_kelurahan'])) : ?>
+                                                <small class="fw-bold text-primary d-block">
+                                                    <?= htmlspecialchars($row['nomor_surat_kelurahan']); ?>
+                                                </small>
+                                            <?php else : ?>
+                                                <small class="text-danger d-block">
+                                                    Belum Diisi
+                                                </small>
+                                            <?php endif; ?>
                                         <?php else : ?>
                                             <span class="text-muted">-</span>
                                         <?php endif; ?>
@@ -509,7 +491,7 @@ $totalTolak = mysqli_num_rows(mysqli_query(
                                                 class="btn btn-info btn-sm">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="../uploads/<?= $row['ktp_upload']; ?>"
+                                            <a href="../uploads/ktp/<?= $row['ktp_upload']; ?>"
                                                 download
                                                 class="btn btn-success btn-sm">
                                                 <i class="fas fa-download"></i>
@@ -519,8 +501,10 @@ $totalTolak = mysqli_num_rows(mysqli_query(
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-center">
-                                        <a href="edit_reserv.php?id=<?= $row['id']; ?>" class="btn-detail-premium">
-                                            <i class="fa-solid fa-folder-open me-1"></i> Audit
+                                        <a href="edit_surat.php?id=<?= $row['id']; ?>"
+                                            class="btn btn-warning btn-sm rounded-3">
+                                            <i class="fas fa-pen"></i>
+                                            Edit
                                         </a>
                                     </td>
                                 </tr>
