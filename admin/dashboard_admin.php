@@ -1,40 +1,93 @@
 <?php
 include 'includes/auth.php';
 include '../db.php';
+include 'includes/auto_status.php';
 
 // Data Admin dari Sesi
 $adminName = isset($_SESSION['admin_data']['nama']) ? $_SESSION['admin_data']['nama'] : 'Administrator';
 
-// --- 1. Statistik Dasar ---
-$totalReservasi = $conn->query("SELECT COUNT(*) as total FROM reservations")->fetch_assoc()['total'];
-$totalPending   = $conn->query("SELECT COUNT(*) as total FROM reservations WHERE status = 'pending'")->fetch_assoc()['total'];
-$totalTempat    = $conn->query("SELECT COUNT(*) as total FROM places")->fetch_assoc()['total'];
-$totalUser = $conn->query(
-    "SELECT COUNT(*) as total FROM users"
-)->fetch_assoc()['total'];
+// ======================================================
+// 1. STATISTIK DASHBOARD
+// ======================================================
 
-// --- 2. Data untuk Doughnut Chart (Status) ---
-$statusData = ['pending' => 0, 'disetujui' => 0, 'ditolak' => 0, 'selesai' => 0];
-$resStatus = $conn->query("SELECT status, COUNT(*) as count FROM reservations GROUP BY status");
+$totalReservasi = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM reservations
+")->fetch_assoc()['total'];
+
+$totalPending = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM reservations
+    WHERE status = 'pending'
+")->fetch_assoc()['total'];
+
+$totalDisetujui = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM reservations
+    WHERE status = 'disetujui'
+")->fetch_assoc()['total'];
+
+$totalSelesai = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM reservations
+    WHERE status = 'selesai'
+")->fetch_assoc()['total'];
+
+$totalTempat = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM places
+")->fetch_assoc()['total'];
+
+$totalUser = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM users
+")->fetch_assoc()['total'];
+
+// ======================================================
+// 2. DATA STATUS RESERVASI (DOUGHNUT CHART)
+// ======================================================
+$statusData = [
+    'pending'    => 0,
+    'disetujui'  => 0,
+    'ditolak'    => 0,
+    'selesai'    => 0
+];
+
+$resStatus = $conn->query("
+    SELECT status, COUNT(*) AS total
+    FROM reservations
+    GROUP BY status
+");
+
 while ($row = $resStatus->fetch_assoc()) {
-    $statusData[$row['status']] = (int)$row['count'];
+    if (isset($statusData[$row['status']])) {
+        $statusData[$row['status']] = (int) $row['total'];
+    }
 }
 
-// --- 3. Data untuk Bar Chart (Tempat Terpopuler) ---
-// Kita joinkan dengan tabel places untuk mendapatkan nama tempatnya
-$popularPlaces = [];
+// ======================================================
+// 3. TEMPAT PALING SERING DIRESERVASI
+// ======================================================
+
 $placeLabels = [];
 $placeCounts = [];
+
 $resPopular = $conn->query("
-    SELECT p.name, COUNT(r.id) as total 
-    FROM places p 
-    LEFT JOIN reservations r ON p.id = r.place_id 
-    GROUP BY p.id 
-    ORDER BY total DESC LIMIT 5
+    SELECT
+        p.name,
+        COUNT(r.id) AS total
+    FROM places p
+    LEFT JOIN reservations r
+        ON p.id = r.place_id
+    GROUP BY p.id, p.name
+    ORDER BY total DESC
+    LIMIT 5
 ");
+
 while ($row = $resPopular->fetch_assoc()) {
+
     $placeLabels[] = $row['name'];
-    $placeCounts[] = (int)$row['total'];
+    $placeCounts[] = (int) $row['total'];
 }
 // --- 4. USER PALING AKTIF ---
 $userLabels = [];

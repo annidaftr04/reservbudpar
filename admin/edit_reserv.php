@@ -1,6 +1,7 @@
 <?php
 include 'includes/auth.php';
 include '../db.php';
+include 'includes/auto_status.php';
 
 // ======================================================
 // CEK ID RESERVASI
@@ -17,21 +18,29 @@ $id = intval($_GET['id']);
 // AMBIL DATA RESERVASI + NAMA TEMPAT
 // ======================================================
 
-$query = "
-    SELECT reservations.*, places.name AS nama_tempat
+$stmt = $conn->prepare("
+    SELECT
+        reservations.*,
+        places.name AS nama_tempat
     FROM reservations
-    LEFT JOIN places ON reservations.place_id = places.id
-    WHERE reservations.id = $id
-";
+    LEFT JOIN places
+        ON reservations.place_id = places.id
+    WHERE reservations.id = ?
+");
 
-$result = $conn->query($query);
+$stmt->bind_param("i", $id);
+$stmt->execute();
 
-if (!$result || $result->num_rows === 0) {
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
     echo "Reservasi tidak ditemukan.";
     exit;
 }
 
 $reservation = $result->fetch_assoc();
+
+$stmt->close();
 // ======================================================
 // RIWAYAT RESERVASI USER
 // ======================================================
@@ -218,10 +227,27 @@ if (!$resultPlaces) {
 
                         <div class="mb-4">
                             <label class="form-label text-primary">Status Persetujuan (Approval)</label>
-                            <select id="status" class="form-select fw-bold text-uppercase">
-                                <option value="pending" <?= $reservation['status'] == 'pending' ? 'selected' : ''; ?>>Pending</option>
-                                <option value="disetujui" <?= $reservation['status'] == 'disetujui' ? 'selected' : ''; ?>>Disetujui</option>
-                                <option value="ditolak" <?= $reservation['status'] == 'ditolak' ? 'selected' : ''; ?>>Ditolak</option>
+                            <select id="status" class="form-select fw-bold">
+                                <option value="pending"
+                                    <?= $reservation['status'] == 'pending' ? 'selected' : ''; ?>>
+                                    Pending
+                                </option>
+
+                                <option value="disetujui"
+                                    <?= $reservation['status'] == 'disetujui' ? 'selected' : ''; ?>>
+                                    Disetujui
+                                </option>
+
+                                <option value="ditolak"
+                                    <?= $reservation['status'] == 'ditolak' ? 'selected' : ''; ?>>
+                                    Ditolak
+                                </option>
+
+                                <option value="selesai"
+                                    <?= $reservation['status'] == 'selesai' ? 'selected' : ''; ?>
+                                    disabled>
+                                    Selesai (Otomatis)
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -243,67 +269,45 @@ if (!$resultPlaces) {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function confirmSave() {
+
             const newStatus = document.getElementById('status').value;
             const oldStatus = '<?= $reservation['status']; ?>';
 
-            // ==================================================
-            // STATUS DISETUJUI
-            // ==================================================
+            let title = 'Simpan perubahan?';
+            let text = '';
+            let icon = 'question';
+            let confirmText = 'Ya';
+
             if (newStatus === 'disetujui' && oldStatus !== 'disetujui') {
 
-                Swal.fire({
-                    title: 'Setujui Reservasi?',
-                    text: 'Status reservasi akan diubah menjadi disetujui.',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, Setujui',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
+                title = 'Setujui Reservasi?';
+                text = 'Status reservasi akan diubah menjadi disetujui.';
+                confirmText = 'Ya, Setujui';
 
-                    if (result.isConfirmed) {
-                        submitStatusUpdate();
-                    }
+            } else if (newStatus === 'ditolak' && oldStatus !== 'ditolak') {
 
-                });
+                title = 'Tolak Reservasi?';
+                text = 'Status reservasi akan diubah menjadi ditolak.';
+                icon = 'warning';
+                confirmText = 'Ya, Tolak';
 
             }
-            // ==================================================
-            // STATUS DITOLAK
-            // ==================================================
-            else if (newStatus === 'ditolak' && oldStatus !== 'ditolak') {
 
-                Swal.fire({
-                    title: 'Tolak Reservasi?',
-                    text: 'Status reservasi akan diubah menjadi ditolak.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, Tolak',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: icon,
+                showCancelButton: true,
+                confirmButtonText: confirmText,
+                cancelButtonText: 'Batal'
+            }).then((result) => {
 
-                    if (result.isConfirmed) {
-                        submitStatusUpdate();
-                    }
+                if (result.isConfirmed) {
+                    submitStatusUpdate();
+                }
 
-                });
+            });
 
-            }
-            // ==================================================
-            // SAVE BIASA
-            // ==================================================
-            else {
-                Swal.fire({
-                    title: 'Simpan perubahan?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        submitStatusUpdate();
-                    }
-                });
-            }
         }
 
         // ======================================================
@@ -326,31 +330,44 @@ if (!$resultPlaces) {
             let message = '';
 
             if (status === 'disetujui') {
-                message =
-                    `Halo ${nama},
-        Kami dengan senang hati menginformasikan bahwa reservasi Anda telah DISETUJUI. 🎉
-        Detail reservasi:
-        📍 Tempat : ${tempatText}
-        📅 Tanggal : ${tanggal}
-        🆔 Kode Booking : ${kodeBooking}
-        ${catatan ? `📝 Catatan Admin :
-        ${catatan}
-        ` : ''}Silakan datang sesuai jadwal yang telah ditentukan.
-        Terima kasih telah menggunakan layanan reservasi Disbudpar Kota Tangerang 😊`;
+                message = `Halo ${nama},
+
+                Kami dengan senang hati menginformasikan bahwa reservasi Anda telah DISETUJUI. 🎉
+
+                Detail reservasi:
+
+                📍 Tempat : ${tempatText}
+                📅 Tanggal : ${tanggal}
+                🆔 Kode Booking : ${kodeBooking}
+
+                ${catatan ? `📝 Catatan Admin :
+                ${catatan}
+
+                ` : ''}
+
+                Silakan datang sesuai jadwal yang telah ditentukan.
+
+                Terima kasih telah menggunakan layanan reservasi Disbudpar Kota Tangerang 😊`;
             } else {
-                message =
-                    `Halo ${nama},
-        Mohon maaf, reservasi Anda belum dapat kami setujui.
-        Detail reservasi:
-        📍 Tempat : ${tempatText}
-        📅 Tanggal : ${tanggal}
-        🆔 Kode Booking : ${kodeBooking}
-        ${catatan ? `📝 Alasan / Catatan Admin :
-        ${catatan}
-        ` : ''}Untuk informasi lebih lanjut, silakan hubungi admin Disbudpar Kota Tangerang.
-        Terima kasih atas perhatian dan pengertiannya 🙏`;
+                message = `Halo ${nama},
+
+                Mohon maaf, reservasi Anda belum dapat kami setujui.
+                
+                Detail reservasi:
+
+                📍 Tempat : ${tempatText}
+                📅 Tanggal : ${tanggal}
+                🆔 Kode Booking : ${kodeBooking}
+
+                ${catatan ? `📝 Alasan / Catatan Admin :
+                ${catatan}
+                ` : ''}
+                
+                Untuk informasi lebih lanjut, silakan hubungi admin Disbudpar Kota Tangerang.
+
+                Terima kasih atas perhatian dan pengertiannya 🙏`;
             }
-            const waLink = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
+            const waLink = `https://web.whatsapp.com/send?phone=${formattedPhone}&text=${encodeURIComponent(message)}`;
 
             // ==========================================
             // SIMPAN LOG WHATSAPP

@@ -1,0 +1,148 @@
+:root {
+  --primary: #4361ee;
+  --navy: #1e293b;
+  --light-bg: #f8f9fc;
+}
+
+body {
+  background-color: var(--light-bg);
+}
+
+.container {
+  max-width: 1000px;
+}
+
+.detail-card {
+  background: #fff;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.card-header-gradient {
+  background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+  padding: 40px;
+  color: white;
+  text-align: center;
+}
+
+.booking-code {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px 20px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.section-title {
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--primary);
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.info-group {
+  margin-bottom: 25px;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.info-value {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 1rem;
+}
+
+.status-pill {
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.status-disetujui {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.status-ditolak {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.status-selesai {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.file-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f1f5f9;
+  padding: 12px 15px;
+  border-radius: 12px;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+.file-link:hover {
+  background: #e2e8f0;
+  color: #3f37c9;
+}
+
+.admin-note {
+  background: #f8fafc;
+  border-left: 4px solid #cbd5e1;
+  padding: 20px;
+  border-radius: 0 12px 12px 0;
+  font-style: italic;
+}
+
+.btn-back {
+  background: #fff;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  padding: 12px 30px;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: 0.3s;
+}
+
+.btn-back:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}

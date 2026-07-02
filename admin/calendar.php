@@ -1,6 +1,11 @@
 <?php
 include 'includes/auth.php';
 include '../db.php';
+include 'includes/auto_status.php';
+
+// =====================================================
+// AMBIL DATA RESERVASI
+// =====================================================
 
 // =====================================================
 // AMBIL DATA RESERVASI
@@ -35,16 +40,9 @@ if ($result && $result->num_rows > 0) {
             $totalHariIni++;
         }
         $tempatAktif[] = $row['nama_tempat'];
-
-        // --- LOGIKA OTOMATISASI WARNA (AUTO-TRIGGER) SIKLUS ACARA ---
-        // Tentukan batas akhir acara untuk pengecekan hari ini
-        $batasAkhirAcara = !empty($row['tanggal_selesai']) ? $row['tanggal_selesai'] : $row['hari'];
-
+        
         // Jika status asli 'selesai' ATAU tanggal hari ini sudah melewati batas akhir acara, maka otomatis ubah status visualnya menjadi selesai
         $statusVisual = $row['status'];
-        if ($row['status'] === 'disetujui' && $today > $batasAkhirAcara) {
-            $statusVisual = 'selesai';
-        }
 
         // Warna disesuaikan dengan status visual (Biru Tua untuk akan datang, Biru Muda untuk selesai)
         $eventColor = ($statusVisual === 'selesai') ? '#06b6d4' : '#4361ee';
@@ -91,7 +89,7 @@ $totalTempatAktif = count(array_unique($tempatAktif));
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/locales/id.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <link rel="stylesheet" href="../assets/css/sidebar.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="../assets/css/calendar.css">

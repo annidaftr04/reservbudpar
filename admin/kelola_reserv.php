@@ -1,6 +1,7 @@
 <?php
 include 'includes/auth.php';
 include '../db.php';
+include 'includes/auto_status.php';
 
 // Inisialisasi variabel pencarian
 $kode_booking_search = $_GET['kode_booking'] ?? '';
@@ -19,18 +20,26 @@ $offset = ($current_page - 1) * $items_per_page;
 $places_list = $conn->query("SELECT id, name FROM places ORDER BY name ASC");
 
 // Query utama dengan JOIN ke tabel places dan sub_places
-$query = "SELECT r.*, p.name as nama_tempat, sp.nama_subtempat 
-            FROM reservations r
-            LEFT JOIN places p ON r.place_id = p.id
-            LEFT JOIN sub_places sp ON r.sub_place_id = sp.id
-            WHERE (r.kode_booking LIKE ? OR ? = '') 
-            AND (r.nama LIKE ? OR ? = '') 
-            AND (r.hari LIKE ? OR ? = '') 
-            AND (r.place_id = ? OR ? = '')
-            AND (r.status LIKE ? OR ? = '')
-            AND (r.sumber_reservasi LIKE ? OR ? = '')
-            ORDER BY r.id DESC
-            LIMIT ? OFFSET ?";
+$query = "
+SELECT
+    r.*,
+    p.name AS nama_tempat,
+    sp.nama_subtempat
+FROM reservations r
+LEFT JOIN places p
+    ON r.place_id = p.id
+LEFT JOIN sub_places sp
+    ON r.sub_place_id = sp.id
+WHERE
+    (r.kode_booking LIKE ? OR ? = '')
+    AND (r.nama LIKE ? OR ? = '')
+    AND (r.hari LIKE ? OR ? = '')
+    AND (r.place_id = ? OR ? = '')
+    AND (r.status LIKE ? OR ? = '')
+    AND (r.sumber_reservasi LIKE ? OR ? = '')
+ORDER BY r.id DESC
+LIMIT ? OFFSET ?
+";
 
 $stmt = $conn->prepare($query);
 $search_kode = "%$kode_booking_search%";
@@ -86,7 +95,7 @@ $count_stmt->bind_param(
 );
 $count_stmt->execute();
 $total_data = $count_stmt->get_result()->fetch_assoc()['total'];
-$total_pages = ceil($total_data / $items_per_page);
+$total_pages = max(1, ceil($total_data / $items_per_page));
 ?>
 
 <!DOCTYPE html>
@@ -95,12 +104,8 @@ $total_pages = ceil($total_data / $items_per_page);
 <head>
 
     <title>Kelola Reservasi | Admin Panel</title>
-
     <?php include 'includes/header.php'; ?>
-
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="../assets/css/sidebar.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="../assets/css/kelola_reserv.css">
@@ -234,8 +239,19 @@ $total_pages = ceil($total_data / $items_per_page);
                                         <div class="small text-muted"><i class="far fa-clock me-1"></i> <?= substr($row['jam_selesai'], 0, 5) ?></div>
                                     </td>
                                     <td>
-                                        <span class="status-badge status-<?= $row['status'] ?>">
-                                            <?= strtoupper($row['status']) ?>
+                                        <?php
+                                        $status = strtolower($row['status']);
+
+                                        $statusText = [
+                                            'pending'    => 'Pending',
+                                            'disetujui'  => 'Disetujui',
+                                            'ditolak'    => 'Ditolak',
+                                            'selesai'    => 'Selesai'
+                                        ];
+                                        ?>
+
+                                        <span class="status-badge status-<?= $status ?>">
+                                            <?= $statusText[$status] ?? ucfirst($status) ?>
                                         </span>
                                     </td>
                                     <td>
@@ -260,7 +276,9 @@ $total_pages = ceil($total_data / $items_per_page);
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7" class="text-center py-5 text-muted">Data tidak ditemukan.</td>
+                                <td colspan="8" class="text-center py-5 text-muted">
+                                    Data reservasi tidak ditemukan.
+                                </td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -268,7 +286,13 @@ $total_pages = ceil($total_data / $items_per_page);
             </div>
 
             <div class="card-footer bg-white border-0 p-4 d-flex justify-content-between align-items-center">
-                <div class="small text-muted">Total Data: <b><?= $total_data ?></b></div>
+                <div class="small text-muted">
+                    Menampilkan
+                    <strong><?= $result->num_rows; ?></strong>
+                    dari
+                    <strong><?= $total_data; ?></strong>
+                    data
+                </div>
                 <nav>
                     <ul class="pagination pagination-sm mb-0">
                         <?php for ($i = 1; $i <= $total_pages; $i++): ?>
